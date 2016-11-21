@@ -22,7 +22,5 @@ class StockPicking(models.Model):
 
     @api.multi
     def action_back_to_draft(self):
-        if self.filtered(lambda p: p.state != 'cancel'):
-            raise UserError(_("You can set to draft cancelled pickings only"))
         moves = self.mapped('move_lines')
         moves.action_back_to_draft()
