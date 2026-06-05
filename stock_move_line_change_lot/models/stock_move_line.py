@@ -167,13 +167,13 @@ class StockMoveLine(models.Model):
                     available_quantity, move_line.quantity_product_uom, rounding
                 ):
                     need = move_line.quantity_product_uom - available_quantity
-                    (freed_quantity, to_reassign_moves) = (
+                    freed_quantity, freed_to_reassign = (
                         move_line._change_lot_free_other_lines(
                             need, location, product, lot, package
                         )
                     )
                     available_quantity += freed_quantity
-                    to_reassign_moves |= to_reassign_moves
+                    to_reassign_moves |= freed_to_reassign
                     if is_lesser(
                         available_quantity, move_line.quantity_product_uom, rounding
                     ) and is_bigger(available_quantity, 0, rounding):
@@ -201,7 +201,7 @@ class StockMoveLine(models.Model):
             # synchronized with the data set on the move line starting from Odoo 18.0
             # (see '<stock.move.line.write()' method in 'stock' module).
             values = vals.copy()
-            values["quantity"] = move_line.quantity
+            values["quantity"] = line.quantity
             res &= super(StockMoveLine, line).write(values)
         if to_reassign_moves:
             self._handle_change_lot_reassign(
